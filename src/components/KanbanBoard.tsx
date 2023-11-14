@@ -1,4 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { createPortal } from "react-dom";
+import {
+	DndContext,
+	DragOverlay,
+	DragStartEvent,
+	DragEndEvent,
+	useSensor,
+	useSensors,
+	PointerSensor,
+} from "@dnd-kit/core";
+import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 
 import ColumnContainer from "./ColumnContainer";
 import AddIcon from "../icons/AddIcon";
@@ -8,6 +19,8 @@ import { generateId } from "../utils/utils";
 const KanbanBoard = () => {
 	// Component State
 	const [cols, setCols] = useState<Column[]>([]);
+	const [currentCol, setCurrCol] = useState<Column | null>(null);
+	const colIds = useMemo(() => cols.map((col) => col.id), [cols]);
 
 	// Component Handler Functions
 	function createNewCol() {
@@ -20,31 +33,93 @@ const KanbanBoard = () => {
 	}
 
 	function deleteColumn(id: Id) {
-		console.log(`Deleting column with id: ${id}`);
-
-		setCols((prev) => prev.filter((col) => col.id !== id));
+		const filteredColumns = cols.filter((col) => col.id !== id);
+		setCols(filteredColumns);
 	}
+
+	function updateColumn(id: Id, title: string) {
+		const updateCols = cols.map((col) => {
+			if (col.id !== id) col;
+			return { ...col, title };
+		})
+
+		setCols(updateCols);
+	}
+
+	function onDragStart(event: DragStartEvent) {
+		if (event.active.data.current?.type === "Column") {
+			setCurrCol(event.active.data.current.column);
+			return;
+		}
+	}
+
+	function onDragEnd(event: DragEndEvent) {
+		const { active, over } = event;
+
+		if (!over) return;
+
+		const activeId = active.id;
+		const overId = over.id;
+
+		if (activeId === overId) return;
+
+		setCols((prev) => {
+			const activeIndex = prev.findIndex((col) => col.id === activeId);
+			const overIndex = prev.findIndex((col) => col.id === overId);
+
+			return arrayMove(prev, activeIndex, overIndex);
+		});
+	}
+
+	const sensors = useSensors(
+		useSensor(PointerSensor, {
+			activationConstraint: {
+				distance: 10,
+			},
+		})
+	);
 
 	return (
 		<div className="m-auto flex min-h-screen w-full items-center justify-center overflow-x-auto overflow-y-hidden px-[40px]">
-			<div className="m-auto flex gap-4">
-				<div className="flex gap-4">
-					{cols.map((column) => (
-						<ColumnContainer
-							column={column}
-							deleteColumn={deleteColumn}
-							key={column.id}
-						/>
-					))}
+			<DndContext
+				onDragStart={onDragStart}
+				onDragEnd={onDragEnd}
+				sensors={sensors}
+			>
+				<div className="m-auto flex gap-4">
+					<div className="flex gap-4">
+						<SortableContext items={colIds}>
+							{cols.map((column) => (
+								<ColumnContainer
+									key={column.id}
+									column={column}
+									deleteColumn={deleteColumn}
+									updateColumn={updateColumn}
+								/>
+							))}
+						</SortableContext>
+					</div>
+					<button
+						className="h-[60px] w-[350px] min-w-[350px] cursor-pointer rounded-lg bg-mainBg border-2 border-colBg p-4 ring-rose-500 hover:ring-2 flex gap-3"
+						onClick={createNewCol}
+					>
+						<AddIcon />
+						<span>Add Column</span>
+					</button>
 				</div>
-				<button
-					className="h-[60px] w-[350px] min-w-[350px] cursor-pointer rounded-lg bg-mainBg border-2 border-colBg p-4 ring-rose-500 hover:ring-2 flex gap-3"
-					onClick={createNewCol}
-				>
-					<AddIcon />
-					<span>Add Column</span>
-				</button>
-			</div>
+				{createPortal(
+					<DragOverlay>
+						{currentCol && (
+							<ColumnContainer
+								column={currentCol}
+								updateColumn={updateColumn}
+								deleteColumn={deleteColumn}
+							/>
+						)}
+					</DragOverlay>,
+					document.body
+				)}
+			</DndContext>
 		</div>
 	);
 };
