@@ -9,11 +9,11 @@ body,
 }
 
 ::-webkit-scrollbar {
-	width: 2rem;
+	width: 4px;
 }
 
 ::-webkit-scrollbar:horizontal {
-	height: 4rem;
+	height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {

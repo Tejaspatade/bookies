@@ -39,7 +39,7 @@ const KanbanBoard = () => {
 
 	function updateColumn(id: Id, title: string) {
 		const updateCols = cols.map((col) => {
-			if (col.id !== id) col;
+			if (col.id !== id) return col;
 			return { ...col, title };
 		})
 
