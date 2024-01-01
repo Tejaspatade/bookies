@@ -4,4 +4,5 @@ export type Bookmark = {
   id: Id,
   columnId: Id,
   content: string,
+  url: string,
 }

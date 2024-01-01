@@ -1,17 +1,23 @@
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+import AddIcon from "../icons/AddIcon";
 import DeleteIcon from "../icons/DeleteIcon";
 import { Column, Id } from "../types/Column";
-import { useState } from "react";
+import { Bookmark } from "../types/Bookmark";
+import ClickableBookmark from "./ClickableBookmark";
 
 interface Props {
 	column: Column;
 	deleteColumn: (id: Id) => void;
 	updateColumn: (id: Id, title: string) => void;
+
+	bookmarks: Bookmark[];
+	createBookmark: (columnId: Id) => void;
 }
 
-const ColumnContainer = ({ column, deleteColumn, updateColumn }: Props) => {
+const ColumnContainer = ({ column, bookmarks, deleteColumn, updateColumn, createBookmark }: Props) => {
 	// Component State
 	const [editMode, setEditMode] = useState(false);
 
@@ -93,9 +99,14 @@ const ColumnContainer = ({ column, deleteColumn, updateColumn }: Props) => {
 			</div>
 
 			{/* Bookmarks */}
-			<div className=""></div>
+			<div className="flex-grow flex flex-col gap-2 p-2">
+				{bookmarks.map((book) => <ClickableBookmark content={book} key={book.id} />)}
+			</div>
 
-			{/* Footer */}
+			{/* Add New Bookmark */}
+			<button className="flex gap-2 items-center border-colBg border-2 rounded-md hover:bg-mainBg hover:text-rose-500 active:bg-black p-4" onClick={() => {createBookmark(column.id)}}>
+				<AddIcon /> <span>Add a Bookmark</span>
+			</button>
 		</div>
 	);
 };

@@ -48,6 +48,17 @@ const KanbanBoard = () => {
 		setCols(updateCols);
 	}
 
+	function createBookmark(columnId: Id) {
+		const newBookmark: Bookmark = {
+			id: generateId(),
+			columnId,
+			content: `Bookmark ${bookmarks.length + 1}`,
+			url: "https://www.google.com", // TODO: Change this to a user input
+		}
+
+		setBookmarks([...bookmarks, newBookmark])
+	}
+
 	function onDragStart(event: DragStartEvent) {
 		if (event.active.data.current?.type === "Column") {
 			setCurrCol(event.active.data.current.column);
@@ -96,8 +107,10 @@ const KanbanBoard = () => {
 								<ColumnContainer
 									key={column.id}
 									column={column}
+									bookmarks={bookmarks.filter((book) => book.columnId === column.id)}
 									deleteColumn={deleteColumn}
 									updateColumn={updateColumn}
+									createBookmark={createBookmark}
 								/>
 							))}
 						</SortableContext>
@@ -107,7 +120,7 @@ const KanbanBoard = () => {
 						onClick={createNewCol}
 					>
 						<AddIcon />
-						<span>Add Column</span>
+						<span>Add Category</span>
 					</button>
 				</div>
 				{createPortal(
@@ -115,8 +128,10 @@ const KanbanBoard = () => {
 						{currentCol && (
 							<ColumnContainer
 								column={currentCol}
+								bookmarks={bookmarks.filter((book) => book.columnId === currentCol.id)}
 								updateColumn={updateColumn}
 								deleteColumn={deleteColumn}
+								createBookmark={createBookmark}
 							/>
 						)}
 					</DragOverlay>,
