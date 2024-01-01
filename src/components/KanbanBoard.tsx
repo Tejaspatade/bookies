@@ -15,11 +15,13 @@ import ColumnContainer from "./ColumnContainer";
 import AddIcon from "../icons/AddIcon";
 import { Column, Id } from "../types/Column";
 import { generateId } from "../utils/utils";
+import { Bookmark } from "../types/Bookmark";
 
 const KanbanBoard = () => {
 	// Component State
 	const [cols, setCols] = useState<Column[]>([]);
 	const [currentCol, setCurrCol] = useState<Column | null>(null);
+	const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 	const colIds = useMemo(() => cols.map((col) => col.id), [cols]);
 
 	// Component Handler Functions
@@ -85,6 +87,7 @@ const KanbanBoard = () => {
 				onDragStart={onDragStart}
 				onDragEnd={onDragEnd}
 				sensors={sensors}
+				
 			>
 				<div className="m-auto flex gap-4">
 					<div className="flex gap-4">
