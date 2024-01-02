@@ -100,7 +100,7 @@ const ColumnContainer = ({ column, bookmarks, deleteColumn, updateColumn, create
 
 			{/* Bookmarks */}
 			<div className="flex-grow flex flex-col gap-2 p-2">
-				{bookmarks.map((book) => <ClickableBookmark content={book} key={book.id} />)}
+				{bookmarks.map((book) => <ClickableBookmark bmark={book} key={book.id} />)}
 			</div>
 
 			{/* Add New Bookmark */}
