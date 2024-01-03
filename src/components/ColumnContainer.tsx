@@ -72,7 +72,9 @@ const ColumnContainer = ({ column, bookmarks, deleteColumn, updateColumn, create
 					<div className="flex justify-center items-center bg-colBg px-2 py-1 text-sm rounded-full">
 						0
 					</div>
-					{!editMode && column.title}
+					<span>
+						{!editMode && column.title}
+					</span>
 					{editMode && (
 						<input
 						className="bg-black focus:border-rose-500 border rounded outline-none px-2 py-2"
